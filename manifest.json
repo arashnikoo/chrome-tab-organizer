@@ -3,18 +3,29 @@
   "name": "Tab Grouper",
   "version": "1.0",
   "description": "Groups tabs intelligently based on the domain.",
-  "permissions": ["tabs", "tabGroups", "storage"],
-  "host_permissions": ["<all_urls>", "http://localhost:11434/*"],
+  "permissions": [
+    "tabs",
+    "tabGroups",
+    "storage"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icon16.png",
       "48": "icon48.png",
-      "128": "icon128.png"
+      "128": "icon128.png",
+      "256": "icon256.png",
+      "512": "icon512.png"
     }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png",
+    "256": "icon256.png",
+    "512": "icon512.png"
   },
   "background": {
     "service_worker": "background.js"
   }
 }
-
