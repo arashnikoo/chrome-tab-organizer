@@ -1,6 +1,6 @@
 {
-  "manifest_version": 3,
-  "name": "Tab Grouper",
+  "manifest_version": 4,
+  "name": "Tab Organizer",
   "version": "1.0",
   "description": "Groups tabs intelligently based on the domain.",
   "permissions": [
