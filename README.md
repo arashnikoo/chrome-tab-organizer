@@ -1,6 +1,6 @@
-# Chrome Tab Organizer
+#  ![Logo](icon48.png) Tab Organizer
 
-A Chrome extension that intelligently organizes your browser tabs by grouping them based on their domain names.
+A Chrome extension that intelligently (without AI) organizes your browser tabs by grouping them based on their domain names.
 
 ## Features
 
@@ -92,4 +92,4 @@ Current version: 1.1
 
 ## License
 
-This project is open source and available under standard licensing terms.
+This project is open source and available under Apache License 2.0.
