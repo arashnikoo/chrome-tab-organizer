@@ -1,6 +1,6 @@
-# Chrome Tab Organizer
+#  ![Logo](icon48.png) [Tab Organizer](https://chromewebstore.google.com/detail/tab-organizer/jiikhdhajknmhcbcoihcoafckkfefmmb)
 
-A Chrome extension that intelligently organizes your browser tabs by grouping them based on their domain names.
+A Chrome extension that intelligently (without AI) organizes your browser tabs by grouping them based on their domain names.
 
 ## Features
 
@@ -13,6 +13,8 @@ A Chrome extension that intelligently organizes your browser tabs by grouping th
 - **Persistent Settings**: Your preferences are saved and persist across browser sessions
 
 ## Installation
+### From Google Chrome Web  Store
+Simply install the packaged, tested, and verified extension from the [official Chrome Web Store](https://chromewebstore.google.com/detail/tab-organizer/jiikhdhajknmhcbcoihcoafckkfefmmb).
 
 ### From Source
 
@@ -92,4 +94,4 @@ Current version: 1.1
 
 ## License
 
-This project is open source and available under standard licensing terms.
+This project is open source and available under Apache License 2.0.
