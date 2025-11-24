@@ -9,8 +9,8 @@
     "storage"
   ],
   "host_permissions": [
-    "http://localhost:3000/*",
-    "https://*.vercel.app/*"
+    "https://tab-organizer-api.arash-nikoo.workers.dev/api/rules",
+    "https://tab-organizer-api.arash-nikoo.workers.dev/health"
   ],
   "action": {
     "default_popup": "popup.html",

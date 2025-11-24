@@ -25,7 +25,7 @@ const DEFAULT_RULES = {
 };
 
 // Rules server configuration
-const RULES_SERVER_URL = 'http://localhost:3000/api/rules'; // Change to your deployed server URL
+const RULES_SERVER_URL = 'https://tab-organizer-api.arash-nikoo.workers.dev/api/rules'; // Change to your deployed server URL
 const RULES_CACHE_KEY = 'groupingRules';
 const RULES_CACHE_TIMESTAMP_KEY = 'groupingRulesTimestamp';
 const RULES_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
