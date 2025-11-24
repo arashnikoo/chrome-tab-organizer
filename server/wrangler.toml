@@ -1,5 +1,5 @@
 name = "tab-organizer-api"
-main = "server.js"
+main = "worker.js"
 compatibility_date = "2025-11-22"
 
 # Enable JSON module imports
