@@ -70,57 +70,69 @@ export default {
 };
 
 // Node.js/Express server (only runs in Node.js environment)
-if (typeof process !== 'undefined' && process.versions && process.versions.node) {
-    const express = (await import('express')).default;
-    const cors = (await import('cors')).default;
+// Check for Node.js environment before importing Express
+const isNodeEnvironment = typeof process !== 'undefined' &&
+    process.versions &&
+    process.versions.node &&
+    typeof global !== 'undefined';
 
-    const app = express();
-    const PORT = process.env.PORT || 3000;
-
-    // Enable CORS for all origins
-    app.use(cors());
-
-    // Serve static files
-    app.use(express.static('public'));
-
-    // API endpoint to get grouping rules
-    app.get('/api/rules', (req, res) => {
+if (isNodeEnvironment) {
+    (async () => {
         try {
-            res.json({
-                success: true,
-                data: RULES
+            const express = (await import('express')).default;
+            const cors = (await import('cors')).default;
+
+            const app = express();
+            const PORT = process.env.PORT || 3000;
+
+            // Enable CORS for all origins
+            app.use(cors());
+
+            // Serve static files
+            app.use(express.static('public'));
+
+            // API endpoint to get grouping rules
+            app.get('/api/rules', (req, res) => {
+                try {
+                    res.json({
+                        success: true,
+                        data: RULES
+                    });
+                } catch (error) {
+                    console.error('Error reading rules:', error);
+                    res.status(500).json({
+                        success: false,
+                        error: 'Failed to load rules'
+                    });
+                }
+            });
+
+            // Health check endpoint
+            app.get('/health', (req, res) => {
+                res.json({ status: 'ok', timestamp: new Date().toISOString() });
+            });
+
+            // Root endpoint
+            app.get('/', (req, res) => {
+                res.json({
+                    name: 'Tab Organizer Rules API',
+                    version: RULES.version,
+                    endpoints: {
+                        '/api/rules': 'Get grouping rules',
+                        '/health': 'Health check'
+                    }
+                });
+            });
+
+            // Start server
+            app.listen(PORT, () => {
+                console.log(`Tab Organizer Rules Server running on port ${PORT}`);
+                console.log(`Rules API available at: http://localhost:${PORT}/api/rules`);
             });
         } catch (error) {
-            console.error('Error reading rules:', error);
-            res.status(500).json({
-                success: false,
-                error: 'Failed to load rules'
-            });
+            // Silently fail if Express is not available (e.g., in Workers environment)
         }
-    });
-
-    // Health check endpoint
-    app.get('/health', (req, res) => {
-        res.json({ status: 'ok', timestamp: new Date().toISOString() });
-    });
-
-    // Root endpoint
-    app.get('/', (req, res) => {
-        res.json({
-            name: 'Tab Organizer Rules API',
-            version: RULES.version,
-            endpoints: {
-                '/api/rules': 'Get grouping rules',
-                '/health': 'Health check'
-            }
-        });
-    });
-
-    // Start server
-    app.listen(PORT, () => {
-        console.log(`Tab Organizer Rules Server running on port ${PORT}`);
-        console.log(`Rules API available at: http://localhost:${PORT}/api/rules`);
-    });
+    })();
 }
 
 
