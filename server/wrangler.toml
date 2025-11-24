@@ -1,0 +1,17 @@
+name = "tab-organizer-rules"
+main = "worker.js"
+compatibility_date = "2025-11-22"
+compatibility_flags = ["nodejs_compat"]
+
+# Enable JSON module imports
+[build]
+command = ""
+
+# Uncomment to use KV storage for rules (optional, for dynamic updates)
+# [[kv_namespaces]]
+# binding = "RULES_KV"
+# id = "your-kv-namespace-id"
+
+# Routes configuration
+[triggers]
+crons = []

@@ -1,0 +1,124 @@
+{
+    "version": "1.0",
+    "lastUpdated": "2025-11-22",
+    "commonSubdomains": [
+        "www",
+        "app",
+        "api",
+        "m",
+        "mobile",
+        "web",
+        "cloud",
+        "mail",
+        "email",
+        "admin",
+        "secure",
+        "login",
+        "auth",
+        "account",
+        "my",
+        "portal",
+        "dashboard",
+        "support",
+        "help",
+        "docs",
+        "blog",
+        "news",
+        "shop",
+        "store",
+        "cdn",
+        "dash",
+        "static",
+        "assets"
+    ],
+    "commonTLDs": [
+        "com",
+        "org",
+        "net",
+        "edu",
+        "gov",
+        "mil",
+        "int",
+        "co",
+        "io",
+        "me",
+        "tv",
+        "app",
+        "dev",
+        "ai"
+    ],
+    "searchEngines": {
+        "google": [
+            "google.com",
+            "google.co.uk",
+            "google.ca",
+            "google.pl",
+            "google.de",
+            "google.fr",
+            "google.it",
+            "google.es",
+            "google.com.au",
+            "google.co.jp"
+        ],
+        "bing": [
+            "bing.com",
+            "www.bing.com"
+        ],
+        "yahoo": [
+            "yahoo.com",
+            "search.yahoo.com",
+            "www.yahoo.com"
+        ],
+        "duckduckgo": [
+            "duckduckgo.com",
+            "www.duckduckgo.com"
+        ]
+    },
+    "googleServices": [
+        {
+            "hostname": "docs.google.com",
+            "pathRules": [
+                {
+                    "pathPrefix": "/spreadsheets",
+                    "groupName": "google sheets"
+                },
+                {
+                    "pathPrefix": "/document",
+                    "groupName": "google docs"
+                },
+                {
+                    "pathPrefix": "/presentation",
+                    "groupName": "google slides"
+                },
+                {
+                    "pathPrefix": "/forms",
+                    "groupName": "google forms"
+                }
+            ],
+            "defaultGroupName": "google docs"
+        },
+        {
+            "hostname": "drive.google.com",
+            "groupName": "google drive"
+        },
+        {
+            "hostname": "mail.google.com",
+            "groupName": "gmail"
+        },
+        {
+            "hostname": "calendar.google.com",
+            "groupName": "google calendar"
+        },
+        {
+            "hostname": "meet.google.com",
+            "groupName": "google meet"
+        }
+    ],
+    "skipPatterns": [
+        "about:blank",
+        "chrome://",
+        "chrome-extension://",
+        "about:",
+        "data:"
+    ]
+}

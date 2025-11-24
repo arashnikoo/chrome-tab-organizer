@@ -26,6 +26,17 @@
       background-color: #3367d6;
     }
 
+    button.secondary {
+      background-color: #5f6368;
+      font-size: 12px;
+      padding: 6px;
+      margin-top: 5px;
+    }
+
+    button.secondary:hover {
+      background-color: #80868b;
+    }
+
     label {
       display: flex;
       align-items: center;
@@ -52,7 +63,7 @@
 <body>
   <h3><img src="icon32.png" alt="Tab Organizer" />Tab Organizer</h3>
   <hr />
-  <button id="groupTabsBtn">Organize Tabs Now</button>
+  <button id="groupTabsBtn">Organize Now</button>
   <label>
     <span>Organize New Tabs Automatically</span>
     <input type="checkbox" id="autoGroupToggle" />
@@ -61,6 +72,11 @@
     <span>Keep Groups in the Same Window</span>
     <input type="checkbox" id="keepInSameWindowToggle" />
   </label>
+  <label>
+    <span>Sort Groups Alphabetically</span>
+    <input type="checkbox" id="sortGroupsAlphabeticallyToggle" />
+  </label>
+  <button id="refreshRulesBtn" class="secondary">Refresh Grouping Rules</button>
 
   <script src="popup.js"></script>
 </body>
