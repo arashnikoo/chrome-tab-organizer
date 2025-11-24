@@ -1,4 +1,4 @@
-name = "tab-organizer-apie"
+name = "tab-organizer-api"
 main = "server.js"
 compatibility_date = "2025-11-22"
 compatibility_flags = ["nodejs_compat"]
