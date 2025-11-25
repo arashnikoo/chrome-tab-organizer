@@ -89,7 +89,7 @@ async function groupTabsBySubdomain(auto = false) {
     }
   }
 
-  // Organize tabs: structure is windowGroups[windowId][groupName] = { tabIds: [], color: null }
+  // Organize tabs: structure is windowGroups[windowId][groupName] = [tabIds]
   // If keepInSameWindow is false, we use a single pseudo-window 'all'
   const windowGroups = {};
 
@@ -118,13 +118,11 @@ async function groupTabsBySubdomain(auto = false) {
       }
 
       let groupName = "";
-      let customColor = null;
 
       // First, check custom rules
       const customMatch = matchCustomRule(tab.url);
       if (customMatch) {
-        groupName = customMatch.groupName;
-        customColor = customMatch.color;
+        groupName = customMatch;
       } else if (useBuiltInRules) {
         // Use built-in rules only if enabled
         groupName = applyBuiltInRules(url, hostname, rules);
@@ -142,12 +140,9 @@ async function groupTabsBySubdomain(auto = false) {
         windowGroups[windowKey] = {};
       }
       if (!windowGroups[windowKey][groupName]) {
-        windowGroups[windowKey][groupName] = {
-          tabIds: [],
-          color: customColor
-        };
+        windowGroups[windowKey][groupName] = [];
       }
-      windowGroups[windowKey][groupName].tabIds.push(tab.id);
+      windowGroups[windowKey][groupName].push(tab.id);
     } catch {
       // skip non-URL tabs and any other invalid URLs
       continue;
@@ -158,10 +153,7 @@ async function groupTabsBySubdomain(auto = false) {
   for (const [windowKey, groups] of Object.entries(windowGroups)) {
     const sortedGroups = Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
 
-    for (const [name, groupData] of sortedGroups) {
-      const tabIds = groupData.tabIds;
-      const customColor = groupData.color;
-
+    for (const [name, tabIds] of sortedGroups) {
       if (tabIds.length === 0) continue;
 
       try {
@@ -174,7 +166,7 @@ async function groupTabsBySubdomain(auto = false) {
 
         await chrome.tabGroups.update(groupId, {
           title: name,
-          color: customColor || randomColor(),
+          color: randomColor(),
           collapsed: collapsed
         });
       } catch (err) {
@@ -213,10 +205,7 @@ function matchCustomRule(url) {
       }
 
       if (isMatch) {
-        return {
-          groupName: rule.groupName,
-          color: rule.color || null
-        };
+        return rule.groupName;
       }
     }
   }

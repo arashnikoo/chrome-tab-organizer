@@ -5,6 +5,7 @@ const USE_BUILT_IN_RULES_KEY = 'useBuiltInRules';
 
 let customRules = [];
 let editingRuleIndex = -1;
+let selectedColor = 'blue'; // Default color
 
 // Initialize the options page
 document.addEventListener('DOMContentLoaded', () => {
@@ -57,7 +58,10 @@ function renderCustomRules() {
     container.innerHTML = customRules.map((rule, index) => `
     <div class="rule-item" data-index="${index}">
       <div class="rule-header">
-        <span class="rule-name">${escapeHtml(rule.groupName)}</span>
+        <span class="rule-name">
+          ${escapeHtml(rule.groupName)}
+          ${rule.color ? `<span class="rule-color-indicator" style="background-color: ${getColorHex(rule.color)};"></span>` : ''}
+        </span>
         <span class="rule-type-badge">${rule.patternType === 'regex' ? 'RegEx' : 'Wildcard'}</span>
       </div>
       <div class="rule-patterns">
@@ -208,20 +212,30 @@ function attachEventListeners() {
         }, 1500);
     });
 
-    // Organize now button
-    document.getElementById('organizeNowBtn').addEventListener('click', () => {
-        chrome.runtime.sendMessage({ action: 'groupTabs' });
-        showStatus('Organizing tabs...', 'success');
+
+    // Color picker
+    document.querySelectorAll('.color-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+            document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+            e.target.classList.add('selected');
+            selectedColor = e.target.dataset.color;
+        });
     });
 }
 
 // Show add rule form
 function showAddRuleForm() {
     editingRuleIndex = -1;
+    selectedColor = 'blue';
     document.getElementById('ruleGroupName').value = '';
     document.getElementById('rulePatternType').value = 'wildcard';
     document.getElementById('rulePatterns').value = '';
     document.getElementById('patternTypeHelp').textContent = 'Use * to match any characters. Example: *github.com/*';
+
+    // Reset color selection
+    document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+    document.querySelector('.color-option[data-color="blue"]').classList.add('selected');
+
     document.getElementById('addRuleForm').classList.add('active');
     document.getElementById('addRuleBtn').style.display = 'none';
 }
@@ -274,7 +288,8 @@ function saveRule() {
         groupName,
         patternType,
         patterns,
-        enabled: true
+        enabled: true,
+        color: selectedColor
     };
 
     if (editingRuleIndex >= 0) {
@@ -304,6 +319,14 @@ function editRule(index) {
     document.getElementById('ruleGroupName').value = rule.groupName;
     document.getElementById('rulePatternType').value = rule.patternType;
     document.getElementById('rulePatterns').value = rule.patterns.join('\n');
+
+    // Set selected color
+    selectedColor = rule.color || 'blue';
+    document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+    const colorOption = document.querySelector(`.color-option[data-color="${selectedColor}"]`);
+    if (colorOption) {
+        colorOption.classList.add('selected');
+    }
 
     const helpText = document.getElementById('patternTypeHelp');
     if (rule.patternType === 'regex') {
@@ -346,4 +369,20 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Get hex color from Chrome color name
+function getColorHex(colorName) {
+    const colorMap = {
+        'grey': '#5f6368',
+        'blue': '#1a73e8',
+        'red': '#d93025',
+        'yellow': '#f9ab00',
+        'green': '#188038',
+        'pink': '#d01884',
+        'purple': '#9334e6',
+        'cyan': '#007b83',
+        'orange': '#e8710a'
+    };
+    return colorMap[colorName] || colorMap['blue'];
 }

@@ -293,6 +293,53 @@
             margin-top: 4px;
         }
 
+        .color-picker-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .color-option {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: #202124;
+            box-shadow: 0 0 0 2px white, 0 0 0 4px #202124;
+        }
+
+        .color-option.selected::after {
+            content: '\2713';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .rule-color-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 8px;
+            vertical-align: middle;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
         .form-actions {
             display: flex;
             gap: 12px;
@@ -461,6 +508,24 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label>Group Color</label>
+                        <div class="color-picker-container" id="colorPickerContainer">
+                            <div class="color-option" data-color="grey" style="background-color: #5f6368;"></div>
+                            <div class="color-option" data-color="blue" style="background-color: #1a73e8;"></div>
+                            <div class="color-option" data-color="red" style="background-color: #d93025;"></div>
+                            <div class="color-option" data-color="yellow" style="background-color: #f9ab00;"></div>
+                            <div class="color-option" data-color="green" style="background-color: #188038;"></div>
+                            <div class="color-option" data-color="pink" style="background-color: #d01884;"></div>
+                            <div class="color-option" data-color="purple" style="background-color: #9334e6;"></div>
+                            <div class="color-option" data-color="cyan" style="background-color: #007b83;"></div>
+                            <div class="color-option" data-color="orange" style="background-color: #e8710a;"></div>
+                        </div>
+                        <div class="form-help">Chrome only supports these colors. For details visit <a
+                                href="https://developer.chrome.com/docs/extensions/reference/api/tabGroups"
+                                target="_blank">Chrome Groups Documentation.</a></div>
+                    </div>
+
                     <div class="form-actions">
                         <button id="saveRuleBtn" class="primary">Save Rule</button>
                         <button id="cancelRuleBtn" class="secondary">Cancel</button>
@@ -475,8 +540,7 @@
             <!-- Built-in Rules Section -->
             <section id="builtInRulesSection">
                 <h2>Built-in Rules</h2>
-                <p class="section-description">View default grouping rules</p>
-
+                <button id="refreshRulesBtn" class="secondary">Refresh Server Rules</button>
                 <button id="toggleBuiltInRulesBtn" class="secondary">Show Built-in Rules</button>
 
                 <div id="builtInRulesDisplay" class="built-in-rules" style="display: none; margin-top: 16px;">
@@ -500,13 +564,6 @@
                         <ul class="built-in-rule-list" id="commonTLDsList"></ul>
                     </div>
                 </div>
-            </section>
-
-            <!-- Actions Section -->
-            <section id="actionsSection">
-                <h2>Actions</h2>
-                <button id="refreshRulesBtn" class="secondary">Refresh Server Rules</button>
-                <button id="organizeNowBtn" class="primary" style="margin-left: 12px;">Organize Tabs Now</button>
             </section>
         </div>
     </div>
