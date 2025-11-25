@@ -1,4 +1,4 @@
-#  ![Logo](icon48.png) [Tab Organizer](https://chromewebstore.google.com/detail/tab-organizer/jiikhdhajknmhcbcoihcoafckkfefmmb)
+#  ![Logo](extension/icon48.png) [Tab Organizer](https://chromewebstore.google.com/detail/tab-organizer/jiikhdhajknmhcbcoihcoafckkfefmmb)
 
 A Chrome extension that intelligently (without AI) organizes your browser tabs by grouping them based on their domain names.
 
