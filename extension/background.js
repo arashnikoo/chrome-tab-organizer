@@ -6,6 +6,8 @@ importScripts("chrome_groups.js");
 let autoGroupEnabled = false;
 let keepInSameWindow = true; // Default to keeping tabs in same window
 let sortGroupsAlphabetically = false; // Default to not sorting groups
+let useBuiltInRules = true; // Default to using built-in rules
+let customRules = []; // User-defined custom rules
 let debounceTimeout = null;
 
 // Cached rules
@@ -17,13 +19,21 @@ fetchRules().then(rules => {
 });
 
 // Load settings on startup
-chrome.storage.sync.get(["autoGroupEnabled", "keepInSameWindow", "sortGroupsAlphabetically"], (data) => {
+chrome.storage.sync.get([
+  "autoGroupEnabled",
+  "keepInSameWindow",
+  "sortGroupsAlphabetically",
+  USE_BUILT_IN_RULES_KEY,
+  CUSTOM_RULES_KEY
+], (data) => {
   autoGroupEnabled = !!data.autoGroupEnabled;
   keepInSameWindow = data.keepInSameWindow !== undefined ? data.keepInSameWindow : true;
   sortGroupsAlphabetically = data.sortGroupsAlphabetically !== undefined ? data.sortGroupsAlphabetically : false;
+  useBuiltInRules = data[USE_BUILT_IN_RULES_KEY] !== undefined ? data[USE_BUILT_IN_RULES_KEY] : true;
+  customRules = data[CUSTOM_RULES_KEY] || [];
 });
 
-chrome.runtime.onMessage.addListener((message) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "groupTabs") {
     groupTabsBySubdomain();
   } else if (message.action === "updateAutoGroupState") {
@@ -32,6 +42,17 @@ chrome.runtime.onMessage.addListener((message) => {
     keepInSameWindow = message.enabled;
   } else if (message.action === "updateSortGroupsAlphabetically") {
     sortGroupsAlphabetically = message.enabled;
+  } else if (message.action === "updateUseBuiltInRules") {
+    useBuiltInRules = message.enabled;
+  } else if (message.action === "customRulesUpdated") {
+    // Reload custom rules when updated
+    chrome.storage.sync.get([CUSTOM_RULES_KEY], (data) => {
+      customRules = data[CUSTOM_RULES_KEY] || [];
+    });
+  } else if (message.action === "getBuiltInRules") {
+    // Send built-in rules to options page
+    sendResponse({ rules: DEFAULT_RULES });
+    return true;
   } else if (message.action === "refreshRules") {
     // Force refresh rules from server
     chrome.storage.local.remove([RULES_CACHE_KEY, RULES_CACHE_TIMESTAMP_KEY]);
@@ -96,22 +117,21 @@ async function groupTabsBySubdomain(auto = false) {
         continue;
       }
 
-      const parts = hostname.split(".");
       let groupName = "";
 
-      // Check for Google services first using rules
-      let isGoogleService;
-      ({ isGoogleService, groupName } = extractGroupNameForGoogleService(rules, hostname, url, groupName));
-
-      // Check if this is a search engine results page using rules
-      let isSearchEngine = false;
-      if (!isGoogleService) {
-        ({ groupName, isSearchEngine } = determineSearchEngineGroup(rules, hostname, url, groupName, isSearchEngine));
+      // First, check custom rules
+      const customMatch = matchCustomRule(tab.url);
+      if (customMatch) {
+        groupName = customMatch;
+      } else if (useBuiltInRules) {
+        // Use built-in rules only if enabled
+        groupName = applyBuiltInRules(url, hostname, rules);
       }
 
-      // If not a search engine or Google service, use regular domain grouping logic
-      if (!groupName)
-        groupName = getDomainGrouping(parts, rules, groupName, hostname);
+      // If no group name determined, skip this tab
+      if (!groupName) {
+        continue;
+      }
 
       // Use actual windowId if keeping in same window, otherwise use 'all' as pseudo-window
       const windowKey = keepInSameWindow ? tab.windowId : 'all';
@@ -161,6 +181,70 @@ async function groupTabsBySubdomain(auto = false) {
   }
 
   if (!auto) console.log("Tabs grouped by subdomain/domain and minimized.");
+}
+
+// Match custom rule against URL
+function matchCustomRule(url) {
+  for (const rule of customRules) {
+    if (!rule.enabled) continue;
+
+    for (const pattern of rule.patterns) {
+      let isMatch = false;
+
+      if (rule.patternType === 'regex') {
+        try {
+          const regex = new RegExp(pattern);
+          isMatch = regex.test(url);
+        } catch (e) {
+          console.warn(`Invalid regex pattern: ${pattern}`, e);
+          continue;
+        }
+      } else {
+        // Wildcard matching
+        isMatch = wildcardMatch(url, pattern);
+      }
+
+      if (isMatch) {
+        return rule.groupName;
+      }
+    }
+  }
+  return null;
+}
+
+// Wildcard matching function
+function wildcardMatch(text, pattern) {
+  // Escape special regex characters except *
+  const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+  // Replace * with .*
+  const regexPattern = '^' + escaped.replace(/\*/g, '.*') + '$';
+  const regex = new RegExp(regexPattern, 'i');
+  return regex.test(text);
+}
+
+// Apply built-in rules to determine group name
+function applyBuiltInRules(url, hostname, rules) {
+  const parts = hostname.split(".");
+  let groupName = "";
+
+  // Check for Google services first using rules
+  let isGoogleService;
+  ({ isGoogleService, groupName } = extractGroupNameForGoogleService(rules, hostname, url, groupName));
+
+  if (isGoogleService) {
+    return groupName;
+  }
+
+  // Check if this is a search engine results page using rules
+  let isSearchEngine = false;
+  ({ groupName, isSearchEngine } = determineSearchEngineGroup(rules, hostname, url, groupName, isSearchEngine));
+
+  if (isSearchEngine) {
+    return groupName;
+  }
+
+  // Use regular domain grouping logic
+  return getDomainGrouping(parts, rules, groupName, hostname);
 }
 
 function determineSearchEngineGroup(rules, hostname, url, groupName, isSearchEngine) {

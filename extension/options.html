@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tab Organizer - Configuration</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: #4285f4;
+            color: white;
+            padding: 24px 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
+
+        section:last-child {
+            margin-bottom: 0;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #202124;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-description {
+            color: #5f6368;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .settings-group {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e8eaed;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-size: 14px;
+            color: #202124;
+        }
+
+        .setting-description {
+            font-size: 12px;
+            color: #5f6368;
+            margin-top: 4px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #4285f4;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+
+        .custom-rules-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .rule-item {
+            background: white;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .rule-item:hover {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .rule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .rule-name {
+            font-weight: 500;
+            font-size: 14px;
+            color: #202124;
+        }
+
+        .rule-type-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: #e8f0fe;
+            color: #1967d2;
+            font-weight: 500;
+        }
+
+        .rule-patterns {
+            font-size: 13px;
+            color: #5f6368;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 8px;
+        }
+
+        .rule-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        button.primary {
+            background-color: #4285f4;
+            color: white;
+        }
+
+        button.primary:hover {
+            background-color: #3367d6;
+        }
+
+        button.secondary {
+            background-color: #f1f3f4;
+            color: #202124;
+        }
+
+        button.secondary:hover {
+            background-color: #e8eaed;
+        }
+
+        button.danger {
+            background-color: #ea4335;
+            color: white;
+        }
+
+        button.danger:hover {
+            background-color: #d33828;
+        }
+
+        button.small {
+            padding: 4px 12px;
+            font-size: 13px;
+        }
+
+        .add-rule-form {
+            background: white;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .add-rule-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #202124;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4285f4;
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .form-help {
+            font-size: 12px;
+            color: #5f6368;
+            margin-top: 4px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .built-in-rules {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .built-in-rule-category {
+            margin-bottom: 20px;
+        }
+
+        .built-in-rule-category h3 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 8px;
+        }
+
+        .built-in-rule-list {
+            font-size: 13px;
+            color: #5f6368;
+            padding-left: 20px;
+        }
+
+        .built-in-rule-list li {
+            margin-bottom: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #5f6368;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .status-message {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status-message.success {
+            background: #e6f4ea;
+            color: #137333;
+            border: 1px solid #ceead6;
+        }
+
+        .status-message.error {
+            background: #fce8e6;
+            color: #c5221f;
+            border: 1px solid #f4c7c3;
+        }
+
+        .status-message.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <img src="icon32.png" alt="Tab Organizer" />
+            <h1>Tab Organizer Configuration</h1>
+        </header>
+
+        <div class="content">
+            <div id="statusMessage" class="status-message"></div>
+
+            <!-- Settings Section -->
+            <section id="settingsSection">
+                <h2>General Settings</h2>
+                <p class="section-description">Configure how Tab Organizer behaves</p>
+
+                <div class="settings-group">
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Auto-organize new tabs</div>
+                            <div class="setting-description">Automatically group new tabs as they're created</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoGroupToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Keep groups in same window</div>
+                            <div class="setting-description">Prevent tabs from moving across windows</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="keepInSameWindowToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Sort groups alphabetically</div>
+                            <div class="setting-description">Order tab groups by name (ungrouped tabs at the end)</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="sortGroupsAlphabeticallyToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Enable built-in rules</div>
+                            <div class="setting-description">Use default grouping rules for common domains</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="useBuiltInRulesToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Custom Rules Section -->
+            <section id="customRulesSection">
+                <h2>Custom Rules</h2>
+                <p class="section-description">Create custom grouping rules with patterns</p>
+
+                <button id="addRuleBtn" class="primary">+ Add Custom Rule</button>
+
+                <div id="addRuleForm" class="add-rule-form">
+                    <h3 style="margin-bottom: 16px;">Add New Rule</h3>
+
+                    <div class="form-group">
+                        <label for="ruleGroupName">Group Name</label>
+                        <input type="text" id="ruleGroupName" placeholder="e.g., Work Projects" required>
+                        <div class="form-help">The name that will appear on the tab group</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rulePatternType">Pattern Type</label>
+                        <select id="rulePatternType">
+                            <option value="wildcard">Wildcard (* for any characters)</option>
+                            <option value="regex">Regular Expression</option>
+                        </select>
+                        <div class="form-help" id="patternTypeHelp">Use * to match any characters. Example: *github.com*
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rulePatterns">URL Patterns (one per line)</label>
+                        <textarea id="rulePatterns" required></textarea>
+                        <div class="form-help">Each pattern on a new line. Tabs matching any pattern will be grouped.
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button id="saveRuleBtn" class="primary">Save Rule</button>
+                        <button id="cancelRuleBtn" class="secondary">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="custom-rules-container">
+                    <div id="customRulesList"></div>
+                </div>
+            </section>
+
+            <!-- Built-in Rules Section -->
+            <section id="builtInRulesSection">
+                <h2>Built-in Rules</h2>
+                <p class="section-description">View default grouping rules</p>
+
+                <button id="toggleBuiltInRulesBtn" class="secondary">Show Built-in Rules</button>
+
+                <div id="builtInRulesDisplay" class="built-in-rules" style="display: none; margin-top: 16px;">
+                    <div class="built-in-rule-category">
+                        <h3>Google Services</h3>
+                        <ul class="built-in-rule-list" id="googleServicesList"></ul>
+                    </div>
+
+                    <div class="built-in-rule-category">
+                        <h3>Search Engines</h3>
+                        <ul class="built-in-rule-list" id="searchEnginesList"></ul>
+                    </div>
+
+                    <div class="built-in-rule-category">
+                        <h3>Common Subdomains (Ignored)</h3>
+                        <ul class="built-in-rule-list" id="commonSubdomainsList"></ul>
+                    </div>
+
+                    <div class="built-in-rule-category">
+                        <h3>Common TLDs</h3>
+                        <ul class="built-in-rule-list" id="commonTLDsList"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Actions Section -->
+            <section id="actionsSection">
+                <h2>Actions</h2>
+                <button id="refreshRulesBtn" class="secondary">Refresh Server Rules</button>
+                <button id="organizeNowBtn" class="primary" style="margin-left: 12px;">Organize Tabs Now</button>
+            </section>
+        </div>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+
+</html>

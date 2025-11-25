@@ -29,3 +29,7 @@ const RULES_SERVER_URL = 'https://tab-organizer-api.arash-nikoo.workers.dev/api/
 const RULES_CACHE_KEY = 'groupingRules';
 const RULES_CACHE_TIMESTAMP_KEY = 'groupingRulesTimestamp';
 const RULES_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+// Custom rules configuration
+const CUSTOM_RULES_KEY = 'customRules';
+const USE_BUILT_IN_RULES_KEY = 'useBuiltInRules';

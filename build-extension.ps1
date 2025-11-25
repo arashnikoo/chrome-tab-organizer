@@ -10,9 +10,9 @@ if (Test-Path $ZipFile) {
     Remove-Item $ZipFile
 }
 
-# Get all files and folders from src directory, excluding .git, markdown, and zip files
-Write-Host "Creating $ZipFile from ./src..."
-$FilesToZip = Get-ChildItem -Path ./src -Recurse | Where-Object {
+# Get all files and folders from "extension" directory, excluding .git, markdown, and zip files
+Write-Host "Creating $ZipFile from ./extension..."
+$FilesToZip = Get-ChildItem -Path ./extension -Recurse | Where-Object {
     $_.FullName -notmatch '\\\.git\\' -and
     $_.FullName -notmatch '\\\.git$' -and
     $_.Extension -ne '.md' -and

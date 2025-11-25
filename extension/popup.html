@@ -51,31 +51,57 @@
     h3 {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 8px;
+      margin: 0;
     }
 
     h3 img {
       vertical-align: middle;
     }
+
+    .title-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .action-row button {
+      width: auto;
+      margin: 0;
+      flex-grow: 1;
+    }
+
+    a {
+      color: #4285f4;
+      text-decoration: none;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 
 <body>
-  <h3><img src="icon32.png" alt="Tab Organizer" />Tab Organizer</h3>
+  <h3>
+    <div class="title-left">
+      <img src="icon32.png" alt="Tab Organizer" />
+      <span>Tab Organizer</span>
+    </div>
+    <a href="#" id="openOptionsLink">Settings</a>
+  </h3>
   <hr />
-  <button id="groupTabsBtn">Organize Now</button>
-  <label>
-    <span>Organize New Tabs Automatically</span>
-    <input type="checkbox" id="autoGroupToggle" />
-  </label>
-  <label>
-    <span>Keep Groups in the Same Window</span>
-    <input type="checkbox" id="keepInSameWindowToggle" />
-  </label>
-  <label>
-    <span>Sort Groups Alphabetically</span>
-    <input type="checkbox" id="sortGroupsAlphabeticallyToggle" />
-  </label>
+  <button id="groupTabsBtn">Organize Tabs Now</button>
   <script src="popup.js"></script>
 </body>
 

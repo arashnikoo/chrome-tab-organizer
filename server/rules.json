@@ -1,6 +1,6 @@
 {
     "version": "1.0",
-    "lastUpdated": "2025-11-22",
+    "lastUpdated": "2025-11-24",
     "commonSubdomains": [
         "www",
         "app",
@@ -29,7 +29,8 @@
         "cdn",
         "dash",
         "static",
-        "assets"
+        "assets",
+        "me"
     ],
     "commonTLDs": [
         "com",

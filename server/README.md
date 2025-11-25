@@ -1,12 +1,12 @@
 # Tab Organizer Rules Server
 
-A unified server implementation that works with both Node.js/Express and Cloudflare Workers.
+A unified server implementation that works with both Node.js and Cloudflare Workers.
 
-## Single File, Dual Platform
+## Architecture
 
-The `server.js` file automatically detects its environment and runs accordingly:
-- **Node.js**: Runs as an Express server
-- **Cloudflare Workers**: Runs as an edge worker
+The server uses a shared request handler (`request-handler.js`) with two entry points:
+- **`worker.js`**: Cloudflare Workers deployment
+- **`server.js`**: Node.js HTTP server (no dependencies)
 
 ## Deployment Options
 
@@ -25,23 +25,25 @@ wrangler deploy
 
 **Pros**: Free, fast, global CDN, zero cold starts, 100k requests/day free tier
 
-### 2. Node.js/Express Server
+### 2. Node.js Server
 
 **Best for**: Local development, custom hosting, self-hosting
 
+No external dependencies required - uses Node.js built-in `http` module.
+
 ## Node.js Server Setup
 
-1. Install dependencies:
+1. No dependencies needed (optional: install `nodemon` for dev mode):
 ```bash
-npm install
+npm install  # Only needed if you want nodemon for development
 ```
 
 2. Start the server:
 ```bash
-npm start
+node server.js
 ```
 
-For development with auto-reload:
+For development with auto-reload (requires nodemon):
 ```bash
 npm run dev
 ```
@@ -84,14 +86,20 @@ See [CLOUDFLARE.md](CLOUDFLARE.md) for complete instructions.
 
 ### Other Platforms
 
-For production deployment of the Express.js server, consider:
-- Using a process manager like PM2
-- Setting up proper CORS restrictions
-- Using HTTPS
-- Hosting on a reliable platform
+The Node.js server has zero dependencies and uses only Node.js built-ins, making it easy to deploy anywhere:
+- Works with any Node.js hosting platform
+- No database or external services required
+- Lightweight and fast
 
 #### Deploy to Vercel
 
 1. Install Vercel CLI: `npm i -g vercel`
 2. Run: `vercel`
 3. Update the extension's `RULES_SERVER_URL` with your deployment URL
+
+## Files
+
+- **`request-handler.js`**: Shared request handling logic (routes, CORS, responses)
+- **`worker.js`**: Cloudflare Workers entry point
+- **`server.js`**: Node.js HTTP server entry point
+- **`rules.json`**: Grouping rules configuration

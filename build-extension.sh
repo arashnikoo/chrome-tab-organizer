@@ -12,9 +12,9 @@ if [ -f "$ZIP_FILE" ]; then
     rm "$ZIP_FILE"
 fi
 
-# Create zip file from src folder, excluding .git folder and build scripts
-echo "Creating $ZIP_FILE from ./src..."
-cd src
+# Create zip file from "extension" folder, excluding .git folder and build scripts
+echo "Creating $ZIP_FILE from ./extension..."
+cd extension
 zip -r "../$ZIP_FILE" . \
     -x "*.git*" \
     -x "*.md" \
