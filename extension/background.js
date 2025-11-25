@@ -30,12 +30,12 @@ chrome.storage.sync.get([
   keepInSameWindow = data.keepInSameWindow !== undefined ? data.keepInSameWindow : true;
   sortGroupsAlphabetically = data.sortGroupsAlphabetically !== undefined ? data.sortGroupsAlphabetically : false;
   useBuiltInRules = data[USE_BUILT_IN_RULES_KEY] !== undefined ? data[USE_BUILT_IN_RULES_KEY] : true;
-  customRules = data[CUSTOM_RULES_KEY] || [];
+  customRules = sortCustomRules(data[CUSTOM_RULES_KEY] || []);
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "groupTabs") {
-    groupTabsBySubdomain();
+    groupTabsNow();
   } else if (message.action === "updateAutoGroupState") {
     autoGroupEnabled = message.enabled;
   } else if (message.action === "updateKeepInSameWindow") {
@@ -47,7 +47,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message.action === "customRulesUpdated") {
     // Reload custom rules when updated
     chrome.storage.sync.get([CUSTOM_RULES_KEY], (data) => {
-      customRules = data[CUSTOM_RULES_KEY] || [];
+      customRules = sortCustomRules(data[CUSTOM_RULES_KEY] || []);
     });
   } else if (message.action === "getBuiltInRules") {
     // Send built-in rules to options page
@@ -66,10 +66,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 chrome.tabs.onCreated.addListener(() => {
   if (!autoGroupEnabled) return;
   clearTimeout(debounceTimeout);
-  debounceTimeout = setTimeout(() => groupTabsBySubdomain(true), 1500);
+  debounceTimeout = setTimeout(() => groupTabsNow(true), 1500);
 });
 
-async function groupTabsBySubdomain(auto = false) {
+async function groupTabsNow(auto = false) {
   // Ensure we have rules loaded
   if (!cachedRules) {
     cachedRules = await fetchRules();
@@ -121,6 +121,7 @@ async function groupTabsBySubdomain(auto = false) {
 
       // First, check custom rules
       const customMatch = matchCustomRule(tab.url);
+
       if (customMatch) {
         groupName = customMatch;
       } else if (useBuiltInRules) {
@@ -183,8 +184,18 @@ async function groupTabsBySubdomain(auto = false) {
   if (!auto) console.log("Tabs grouped by subdomain/domain and minimized.");
 }
 
+// Sort custom rules by order (lower number = higher priority)
+function sortCustomRules(rules) {
+  return [...rules].sort((a, b) => {
+    const orderA = a.order !== undefined ? a.order : Number.MAX_SAFE_INTEGER;
+    const orderB = b.order !== undefined ? b.order : Number.MAX_SAFE_INTEGER;
+    return orderA - orderB;
+  });
+}
+
 // Match custom rule against URL
 function matchCustomRule(url) {
+  // Rules are already sorted by priority, no need to sort again
   for (const rule of customRules) {
     if (!rule.enabled) continue;
 

@@ -37,6 +37,11 @@ function loadSettings() {
 function loadCustomRules() {
     chrome.storage.sync.get([CUSTOM_RULES_KEY], (data) => {
         customRules = data[CUSTOM_RULES_KEY] || [];
+        // Ensure all rules have an order field
+        customRules = customRules.map((rule, index) => ({
+            ...rule,
+            order: rule.order !== undefined ? rule.order : index
+        }));
         renderCustomRules();
     });
 }
@@ -55,24 +60,44 @@ function renderCustomRules() {
         return;
     }
 
-    container.innerHTML = customRules.map((rule, index) => `
-    <div class="rule-item" data-index="${index}">
-      <div class="rule-header">
-        <span class="rule-name">
-          ${escapeHtml(rule.groupName)}
-          ${rule.color ? `<span class="rule-color-indicator" style="background-color: ${getColorHex(rule.color)};"></span>` : ''}
-        </span>
-        <span class="rule-type-badge">${rule.patternType === 'regex' ? 'RegEx' : 'Wildcard'}</span>
+    // Sort rules by order (lower number = higher priority)
+    const sortedRules = [...customRules].sort((a, b) => {
+        const orderA = a.order !== undefined ? a.order : Number.MAX_SAFE_INTEGER;
+        const orderB = b.order !== undefined ? b.order : Number.MAX_SAFE_INTEGER;
+        return orderA - orderB;
+    });
+
+    container.innerHTML = sortedRules.map((rule, displayIndex) => {
+        const actualIndex = customRules.indexOf(rule);
+        const isFirst = displayIndex === 0;
+        const isLast = displayIndex === sortedRules.length - 1;
+
+        return `
+    <div class="rule-item" data-index="${actualIndex}">
+      <div class="rule-order-controls">
+        <button class="rule-order-btn move-up-btn" data-index="${actualIndex}" ${isFirst ? 'disabled' : ''} title="Move up (higher priority)">&#9650;</button>
+        <button class="rule-order-btn move-down-btn" data-index="${actualIndex}" ${isLast ? 'disabled' : ''} title="Move down (lower priority)">&#9660;</button>
       </div>
-      <div class="rule-patterns">
-        ${rule.patterns.map(p => escapeHtml(p)).join('<br>')}
-      </div>
-      <div class="rule-actions">
-        <button class="secondary small edit-rule-btn" data-index="${index}">Edit</button>
-        <button class="danger small delete-rule-btn" data-index="${index}">Delete</button>
+      <div class="rule-content">
+        <div class="rule-header">
+          <span class="rule-name">
+            ${escapeHtml(rule.groupName)}
+            ${rule.color ? `<span class="rule-color-indicator" style="background-color: ${getColorHex(rule.color)};"></span>` : ''}
+            <span class="rule-priority-badge">Priority ${displayIndex + 1}</span>
+          </span>
+          <span class="rule-type-badge">${rule.patternType === 'regex' ? 'RegEx' : 'Wildcard'}</span>
+        </div>
+        <div class="rule-patterns">
+          ${rule.patterns.map(p => escapeHtml(p)).join('<br>')}
+        </div>
+        <div class="rule-actions">
+          <button class="secondary small edit-rule-btn" data-index="${actualIndex}">Edit</button>
+          <button class="danger small delete-rule-btn" data-index="${actualIndex}">Delete</button>
+        </div>
       </div>
     </div>
-  `).join('');
+  `;
+    }).join('');
 
     // Attach event listeners to rule action buttons
     container.querySelectorAll('.edit-rule-btn').forEach(btn => {
@@ -86,6 +111,20 @@ function renderCustomRules() {
         btn.addEventListener('click', (e) => {
             const index = parseInt(e.target.dataset.index);
             deleteRule(index);
+        });
+    });
+
+    container.querySelectorAll('.move-up-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const index = parseInt(e.target.dataset.index);
+            moveRuleUp(index);
+        });
+    });
+
+    container.querySelectorAll('.move-down-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const index = parseInt(e.target.dataset.index);
+            moveRuleDown(index);
         });
     });
 }
@@ -293,10 +332,15 @@ function saveRule() {
     };
 
     if (editingRuleIndex >= 0) {
-        // Update existing rule
+        // Update existing rule - preserve its order
+        rule.order = customRules[editingRuleIndex].order;
         customRules[editingRuleIndex] = rule;
     } else {
-        // Add new rule
+        // Add new rule at the end (highest order number)
+        const maxOrder = customRules.length > 0
+            ? Math.max(...customRules.map(r => r.order !== undefined ? r.order : 0))
+            : -1;
+        rule.order = maxOrder + 1;
         customRules.push(rule);
     }
 
@@ -343,6 +387,10 @@ function editRule(index) {
 function deleteRule(index) {
     if (confirm('Are you sure you want to delete this rule?')) {
         customRules.splice(index, 1);
+        // Reassign order values
+        customRules.forEach((rule, i) => {
+            rule.order = i;
+        });
         chrome.storage.sync.set({ [CUSTOM_RULES_KEY]: customRules }, () => {
             renderCustomRules();
             showStatus('Rule deleted successfully', 'success');
@@ -351,6 +399,67 @@ function deleteRule(index) {
             chrome.runtime.sendMessage({ action: 'customRulesUpdated' });
         });
     }
+}
+
+// Move rule up (higher priority, lower order number)
+function moveRuleUp(index) {
+    const rule = customRules[index];
+    const currentOrder = rule.order !== undefined ? rule.order : index;
+
+    // Find the rule with the next lower order value
+    const sortedRules = [...customRules].sort((a, b) => {
+        const orderA = a.order !== undefined ? a.order : Number.MAX_SAFE_INTEGER;
+        const orderB = b.order !== undefined ? b.order : Number.MAX_SAFE_INTEGER;
+        return orderA - orderB;
+    });
+
+    const currentDisplayIndex = sortedRules.indexOf(rule);
+    if (currentDisplayIndex === 0) return; // Already at top
+
+    const swapRule = sortedRules[currentDisplayIndex - 1];
+    const swapOrder = swapRule.order !== undefined ? swapRule.order : customRules.indexOf(swapRule);
+
+    // Swap orders
+    rule.order = swapOrder;
+    swapRule.order = currentOrder;
+
+    saveRulesOrder();
+}
+
+// Move rule down (lower priority, higher order number)
+function moveRuleDown(index) {
+    const rule = customRules[index];
+    const currentOrder = rule.order !== undefined ? rule.order : index;
+
+    // Find the rule with the next higher order value
+    const sortedRules = [...customRules].sort((a, b) => {
+        const orderA = a.order !== undefined ? a.order : Number.MAX_SAFE_INTEGER;
+        const orderB = b.order !== undefined ? b.order : Number.MAX_SAFE_INTEGER;
+        return orderA - orderB;
+    });
+
+    const currentDisplayIndex = sortedRules.indexOf(rule);
+    if (currentDisplayIndex === sortedRules.length - 1) return; // Already at bottom
+
+    const swapRule = sortedRules[currentDisplayIndex + 1];
+    const swapOrder = swapRule.order !== undefined ? swapRule.order : customRules.indexOf(swapRule);
+
+    // Swap orders
+    rule.order = swapOrder;
+    swapRule.order = currentOrder;
+
+    saveRulesOrder();
+}
+
+// Save rules order to storage
+function saveRulesOrder() {
+    chrome.storage.sync.set({ [CUSTOM_RULES_KEY]: customRules }, () => {
+        renderCustomRules();
+        showStatus('Rule order updated', 'success');
+
+        // Notify background script
+        chrome.runtime.sendMessage({ action: 'customRulesUpdated' });
+    });
 }
 
 // Show status message
