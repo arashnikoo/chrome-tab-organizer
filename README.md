@@ -1,4 +1,4 @@
-# ![Logo](extension/icon48.png) Tab Organizer
+# ![Logo](extension/icon48.png) [Tab Organizer](https://chromewebstore.google.com/detail/tab-organizer/jiikhdhajknmhcbcoihcoafckkfefmmb)
 
 A Chrome extension that intelligently organizes your browser tabs by grouping them based on domain names and custom rules.
 
@@ -111,26 +111,6 @@ The extension fetches built-in grouping rules from an optional server. See [serv
 - **tabGroups**: Create and manage tab groups
 - **storage**: Save preferences, custom rules, and cache built-in rules
 - **host_permissions**: Fetch grouping rules from the server
-
-## Browser Compatibility
-
-- Chrome (Manifest V3)
-- Edge (Chromium-based)
-- Other Chromium-based browsers with Manifest V3 support
-
-## Files Structure
-
-### Extension Files (`extension/`)
-- `manifest.json` - Extension configuration
-- `popup.html` - Quick actions popup
-- `popup.js` - Popup logic
-- `options.html` - Configuration page
-- `options.js` - Settings and custom rules management
-- `background.js` - Service worker for tab management and grouping logic
-- `utils.js` - Utility functions
-- `constants.js` - Constants and default rules
-- `api_client.js` - Server API communication
-- `chrome_groups.js` - Tab group operations
 
 ## License
 
